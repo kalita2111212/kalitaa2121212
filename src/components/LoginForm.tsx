@@ -38,6 +38,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         .maybeSingle()
 
       if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Error checking existing voter:', checkError)
         throw checkError
       }
 
@@ -45,28 +46,41 @@ export function LoginForm({ onLogin }: LoginFormProps) {
       
       if (existingVoter) {
         // Jika voter sudah ada, gunakan data yang ada
+        console.log('Existing voter found:', existingVoter)
         voterData = existingVoter
       } else {
         // Jika voter belum ada, buat voter baru
+        console.log('Creating new voter with data:', { name: name.trim(), address: address.trim() })
         const { data, error } = await supabase
           .from('voters')
           .insert([{ name: name.trim(), address: address.trim() }])
           .select()
           .single()
 
-        if (error) throw error
+        if (error) {
+          console.error('Error creating new voter:', error)
+          throw error
+        }
+        
+        console.log('New voter created:', data)
         voterData = data
       }
 
+      console.log('Final voter data:', voterData)
       onLogin({
         id: voterData.id,
         name: voterData.name,
-        address: voterData.address,
-        voted_for: voterData.voted_for
+        address: voterData.address
       })
     } catch (error) {
       console.error('Error creating voter:', error)
-      setError('Terjadi kesalahan saat login. Silakan coba lagi.')
+      if (error.code === '42501') {
+        setError('Tidak memiliki izin untuk menambah data pemilih. Silakan hubungi administrator.')
+      } else if (error.code === '23505') {
+        setError('Data pemilih dengan nama dan alamat yang sama sudah ada.')
+      } else {
+        setError(`Terjadi kesalahan saat login: ${error.message}. Silakan coba lagi.`)
+      }
     } finally {
       setIsLoading(false)
     }
