@@ -130,7 +130,7 @@ export function VotingInterface({ voter, onLogout }: VotingInterfaceProps) {
     if (hasVoted || isVoting) return
     
     if (!isSupabaseConfigured) {
-      alert('Supabase belum dikonfigurasi dengan benar')
+      alert('Database belum dikonfigurasi. Silakan setup Supabase terlebih dahulu.')
       return
     }
 

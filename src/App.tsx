@@ -62,13 +62,18 @@ function App() {
           <div className="text-gray-600 mb-4">
             {!isSupabaseConfigured ? (
               <div className="text-left">
-                <p className="mb-3">Untuk menggunakan aplikasi ini, Anda perlu:</p>
+                <p className="mb-3 text-center">Untuk menggunakan aplikasi voting ini, silakan:</p>
                 <ol className="list-decimal list-inside space-y-2 text-sm">
-                  <li>Buat project di <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">supabase.com</a></li>
-                  <li>Salin Project URL dan Anon Key dari Settings → API</li>
-                  <li>Update file .env dengan kredensial yang benar</li>
-                  <li>Restart aplikasi</li>
+                  <li>Klik tombol "Connect to Supabase" di pojok kanan atas</li>
+                  <li>Atau buat project di <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">supabase.com</a></li>
+                  <li>Salin Project URL dan Anon Key</li>
+                  <li>Update file .env dengan kredensial Anda</li>
                 </ol>
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <p className="text-xs text-blue-600">
+                    💡 <strong>Tips:</strong> Gunakan tombol "Connect to Supabase" untuk setup otomatis
+                  </p>
+                </div>
               </div>
             ) : (
               <p>Tidak dapat terhubung ke database Supabase. Pastikan konfigurasi sudah benar.</p>

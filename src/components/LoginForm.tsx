@@ -16,7 +16,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
     e.preventDefault()
     
     if (!isSupabaseConfigured) {
-      setError('Supabase belum dikonfigurasi dengan benar')
+      setError('Database belum dikonfigurasi. Silakan klik "Connect to Supabase" di pojok kanan atas.')
       return
     }
     
