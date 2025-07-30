@@ -1,17 +1,30 @@
 import { createClient } from '@supabase/supabase-js'
 
 // Konfigurasi Supabase - Menggunakan environment variables dari Vite
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.error('Supabase URL dan Anon Key harus dikonfigurasi di file .env')
-}
+// Validasi environment variables
+const isConfigured = SUPABASE_URL && 
+  SUPABASE_ANON_KEY && 
+  SUPABASE_URL !== 'https://your-project-url.supabase.co' &&
+  SUPABASE_ANON_KEY !== 'your-anon-key-here'
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+// Buat client dengan fallback untuk development
+export const supabase = isConfigured 
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : createClient('https://placeholder.supabase.co', 'placeholder-key')
+
+// Export status konfigurasi
+export const isSupabaseConfigured = isConfigured
 
 // Test koneksi Supabase
 export const testSupabaseConnection = async () => {
+  if (!isSupabaseConfigured) {
+    console.warn('Supabase belum dikonfigurasi dengan benar')
+    return false
+  }
+
   try {
     const { data, error } = await supabase.from('voters').select('count').limit(1)
     if (error) {

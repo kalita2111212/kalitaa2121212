@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { User, MapPin, LogIn } from 'lucide-react'
-import { supabase } from '../lib/supabase'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 interface LoginFormProps {
   onLogin: (voter: { id: string; name: string; address: string }) => void
@@ -14,6 +14,12 @@ export function LoginForm({ onLogin }: LoginFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!isSupabaseConfigured) {
+      setError('Supabase belum dikonfigurasi dengan benar')
+      return
+    }
+    
     if (!name.trim() || !address.trim()) {
       setError('Nama dan alamat harus diisi')
       return

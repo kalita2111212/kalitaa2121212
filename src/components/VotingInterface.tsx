@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { LogOut, Vote, Check, BarChart3 } from 'lucide-react'
-import { supabase } from '../lib/supabase'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 interface VotingInterfaceProps {
   voter: { id: string; name: string; address: string; voted_for: string | null }
@@ -46,6 +46,8 @@ export function VotingInterface({ voter, onLogout }: VotingInterfaceProps) {
   }, [])
 
   const checkIfVoted = async () => {
+    if (!isSupabaseConfigured) return
+    
     try {
       const { data, error } = await supabase
         .from('votes')
@@ -69,6 +71,17 @@ export function VotingInterface({ voter, onLogout }: VotingInterfaceProps) {
   }
 
   const fetchVoteCounts = async () => {
+    if (!isSupabaseConfigured) {
+      // Set default values jika Supabase tidak dikonfigurasi
+      const defaultCounts = CANDIDATES.map(candidate => ({
+        candidate_name: candidate,
+        count: 0
+      }))
+      setVoteCounts(defaultCounts)
+      setTotalVotes(0)
+      return
+    }
+    
     try {
       const { data, error } = await supabase
         .from('votes')
@@ -96,6 +109,8 @@ export function VotingInterface({ voter, onLogout }: VotingInterfaceProps) {
   }
 
   const subscribeToVotes = () => {
+    if (!isSupabaseConfigured) return () => {}
+    
     const channel = supabase
       .channel('votes-changes')
       .on('postgres_changes', 
@@ -113,6 +128,11 @@ export function VotingInterface({ voter, onLogout }: VotingInterfaceProps) {
 
   const handleVote = async (candidateName: string) => {
     if (hasVoted || isVoting) return
+    
+    if (!isSupabaseConfigured) {
+      alert('Supabase belum dikonfigurasi dengan benar')
+      return
+    }
 
     setIsVoting(true)
     try {

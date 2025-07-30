@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { LoginForm } from './components/LoginForm'
 import { VotingInterface } from './components/VotingInterface'
-import { testSupabaseConnection } from './lib/supabase'
+import { testSupabaseConnection, isSupabaseConfigured } from './lib/supabase'
 
 interface Voter {
   id: string
@@ -15,8 +15,11 @@ function App() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null)
 
   useEffect(() => {
-    // Test koneksi Supabase saat aplikasi dimuat
     const checkConnection = async () => {
+      if (!isSupabaseConfigured) {
+        setIsConnected(false)
+        return
+      }
       const connected = await testSupabaseConnection()
       setIsConnected(connected)
     }
@@ -53,10 +56,24 @@ function App() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-gray-800 mb-2">Koneksi Database Gagal</h2>
-          <p className="text-gray-600 mb-4">
-            Tidak dapat terhubung ke database Supabase. Pastikan konfigurasi sudah benar.
-          </p>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">
+            {!isSupabaseConfigured ? 'Konfigurasi Supabase Diperlukan' : 'Koneksi Database Gagal'}
+          </h2>
+          <div className="text-gray-600 mb-4">
+            {!isSupabaseConfigured ? (
+              <div className="text-left">
+                <p className="mb-3">Untuk menggunakan aplikasi ini, Anda perlu:</p>
+                <ol className="list-decimal list-inside space-y-2 text-sm">
+                  <li>Buat project di <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">supabase.com</a></li>
+                  <li>Salin Project URL dan Anon Key dari Settings → API</li>
+                  <li>Update file .env dengan kredensial yang benar</li>
+                  <li>Restart aplikasi</li>
+                </ol>
+              </div>
+            ) : (
+              <p>Tidak dapat terhubung ke database Supabase. Pastikan konfigurasi sudah benar.</p>
+            )}
+          </div>
           <button 
             onClick={() => window.location.reload()} 
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
